@@ -40,7 +40,11 @@ export const DeviationsByNodeChart = ({ data, onNodeClick }: DeviationsByNodeCha
         />
         <Bar
           dataKey="count"
-          onClick={(data) => onNodeClick && onNodeClick(data.node_id)}
+          onClick={(data: any) => {
+            if (onNodeClick && data?.payload?.node_id) {
+              onNodeClick(data.payload.node_id);
+            }
+          }}
           style={{ cursor: onNodeClick ? 'pointer' : 'default' }}
         >
           {data.map((entry, index) => (

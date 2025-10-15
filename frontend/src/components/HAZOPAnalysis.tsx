@@ -1463,7 +1463,7 @@ export const HAZOPAnalysis = ({ deviation, onUnsavedChanges }: HAZOPAnalysisProp
                   type="date"
                   name="target_date"
                   className="w-full border rounded px-3 py-2"
-                  defaultValue={editMode.type === 'recommendation' ? (editingItem as Recommendation)?.due_date?.toString().split('T')[0] || '' : ''}
+                  defaultValue={editMode.type === 'recommendation' ? (editingItem as Recommendation)?.target_date?.toString().split('T')[0] || '' : ''}
                 />
               </div>
               <div className="flex justify-end gap-2">
