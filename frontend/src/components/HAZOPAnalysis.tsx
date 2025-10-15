@@ -1559,8 +1559,8 @@ export const HAZOPAnalysis = ({ deviation, onUnsavedChanges }: HAZOPAnalysisProp
       {/* Gemini AI Insights Panel */}
       <GeminiInsightsPanel
         deviation={deviation}
-        selectedCauseId={selectedCauseId}
-        selectedConsequenceId={selectedConsequenceId}
+        selectedCauseId={selectedCauseId ?? undefined}
+        selectedConsequenceId={selectedConsequenceId ?? undefined}
         onAddCause={async (suggestion) => {
           // Reload all data to update the UI with new cause
           await loadAll();
