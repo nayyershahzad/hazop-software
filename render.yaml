@@ -6,7 +6,7 @@ databases:
 services:
   # Backend API Service
   - type: web
-    name: hazop-backend
+    name: hazop-api
     env: python
     buildCommand: pip install -r backend/requirements.txt
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
@@ -28,7 +28,7 @@ services:
       - key: CORS_ORIGINS
         fromService:
           type: web
-          name: hazop-frontend
+          name: hazop-web
           envVarKey: RENDER_EXTERNAL_URL
       - key: ENVIRONMENT
         value: production
@@ -36,7 +36,7 @@ services:
 
   # Frontend Static Site
   - type: web
-    name: hazop-frontend
+    name: hazop-web
     env: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
@@ -44,7 +44,7 @@ services:
       - key: VITE_API_URL
         fromService:
           type: web
-          name: hazop-backend
+          name: hazop-api
           envVarKey: RENDER_EXTERNAL_URL
     routes:
       - type: rewrite
