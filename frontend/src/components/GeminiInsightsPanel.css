@@ -1,0 +1,107 @@
+/* GeminiInsightsPanel.css */
+
+.gemini-panel {
+  transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+  z-index: 100;
+}
+
+.gemini-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.gemini-suggestion {
+  transition: all 0.2s ease-in-out;
+}
+
+.gemini-suggestion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.gemini-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+}
+
+.confidence-badge {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: rgb(79, 70, 229);
+}
+
+.reasoning-container {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.reasoning-container.expanded {
+  max-height: 200px;
+}
+
+.suggestions-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.suggestions-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.suggestions-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-container::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 9999px;
+}
+
+/* Insight type indicators */
+.insight-type-causes {
+  border-left-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.insight-type-consequences {
+  border-left-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.insight-type-safeguards {
+  border-left-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Floating pulse animation for AI assistance indicator */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(124, 58, 237, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+  border-radius: 50%;
+}

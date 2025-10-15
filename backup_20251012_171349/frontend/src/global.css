@@ -1,0 +1,10 @@
+/* Import react-pdf styles directly without Tailwind processing */
+@import 'react-pdf/dist/Page/AnnotationLayer.css';
+@import 'react-pdf/dist/Page/TextLayer.css';
+
+/* Add any global styles here */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}

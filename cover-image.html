@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAZOP Software - LinkedIn Cover</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .cover-container {
+            width: 1200px;
+            height: 628px; /* LinkedIn recommended size */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* Animated background elements */
+        .bg-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .circle1 { width: 300px; height: 300px; top: -100px; left: -100px; animation-delay: 0s; }
+        .circle2 { width: 200px; height: 200px; bottom: -50px; right: 100px; animation-delay: 5s; }
+        .circle3 { width: 150px; height: 150px; top: 200px; right: -50px; animation-delay: 10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* Grid overlay */
+        .grid-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        /* Main content */
+        .content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 80px;
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            font-size: 72px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .features {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .feature-pill {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 24px;
+        }
+
+        /* Tech stack indicators */
+        .tech-stack {
+            position: absolute;
+            bottom: 40px;
+            left: 80px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* AI accent */
+        .ai-accent {
+            position: absolute;
+            top: 40px;
+            right: 80px;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 60px rgba(255, 215, 0, 0.6); }
+        }
+
+        /* LinkedIn branding corner */
+        .linkedin-corner {
+            position: absolute;
+            bottom: 40px;
+            right: 80px;
+            font-size: 14px;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .linkedin-icon {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0077B5;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cover-container">
+        <!-- Background elements -->
+        <div class="bg-elements">
+            <div class="circle circle1"></div>
+            <div class="circle circle2"></div>
+            <div class="circle circle3"></div>
+        </div>
+
+        <div class="grid-overlay"></div>
+
+        <!-- AI Accent -->
+        <div class="ai-accent">🤖</div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="badge">🚀 PROCESS SAFETY INNOVATION</div>
+
+            <h1>AI-Powered<br/>HAZOP Software</h1>
+
+            <div class="subtitle">
+                Revolutionizing Safety Analysis with Intelligence
+            </div>
+
+            <div class="features">
+                <div class="feature-pill">
+                    <span class="icon">🗄️</span>
+                    <span>Database-Driven</span>
+                </div>
+                <div class="feature-pill">
+                    <span class="icon">📊</span>
+                    <span>Real-Time Dashboard</span>
+                </div>
+                <div class="feature-pill">
+                    <span class="icon">🎯</span>
+                    <span>P&ID Integration</span>
+                </div>
+            </div>
+
+            <!-- Tech Stack -->
+            <div class="tech-stack">
+                <div class="tech-badge">React</div>
+                <div class="tech-badge">FastAPI</div>
+                <div class="tech-badge">PostgreSQL</div>
+                <div class="tech-badge">Gemini AI</div>
+            </div>
+        </div>
+
+        <!-- LinkedIn Corner -->
+        <div class="linkedin-corner">
+            <div class="linkedin-icon">in</div>
+            <span>LinkedIn Article</span>
+        </div>
+    </div>
+
+    <script>
+        // Optional: Add more interactivity
+        console.log('HAZOP Software Cover Image Ready!');
+    </script>
+</body>
+</html>

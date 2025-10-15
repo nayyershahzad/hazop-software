@@ -1,0 +1,521 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import type { Deviation, Node, Cause, Consequence, Safeguard } from '../types';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+interface AISuggestion {
+  text: string;
+  confidence: number;
+  reasoning?: string;
+}
+
+interface AIConsequenceSuggestion extends AISuggestion {
+  severity?: string;
+  category?: string;
+}
+
+interface AISafeguardSuggestion extends AISuggestion {
+  type?: string;
+  effectiveness?: string;
+}
+
+interface GeminiInsightsPanelProps {
+  deviation: Deviation;
+  selectedCauseId?: string;
+  selectedConsequenceId?: string;
+  onAddCause?: (cause: AISuggestion) => void;
+  onAddConsequence?: (consequence: AIConsequenceSuggestion) => void;
+  onAddSafeguard?: (safeguard: AISafeguardSuggestion) => void;
+  onAddAllSuggestions?: () => void;
+}
+
+export const GeminiInsightsPanel = ({
+  deviation,
+  selectedCauseId,
+  selectedConsequenceId,
+  onAddCause,
+  onAddConsequence,
+  onAddSafeguard,
+  onAddAllSuggestions,
+}: GeminiInsightsPanelProps) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [suggestedCauses, setSuggestedCauses] = useState<AISuggestion[]>([]);
+  const [suggestedConsequences, setSuggestedConsequences] = useState<AIConsequenceSuggestion[]>([]);
+  const [suggestedRecommendations, setSuggestedRecommendations] = useState<AISafeguardSuggestion[]>([]);
+  const [insightType, setInsightType] = useState<'causes' | 'consequences' | 'recommendations'>('causes');
+  const [showContext, setShowContext] = useState(false);
+  const [processContext, setProcessContext] = useState({
+    process_description: '',
+    fluid_type: '',
+    operating_conditions: '',
+    previous_incidents: '',
+  });
+
+  // Load suggestions when the component mounts or when the deviation changes
+  useEffect(() => {
+    if (deviation) {
+      loadSuggestions();
+    }
+  }, [deviation.id, selectedCauseId, selectedConsequenceId, insightType]);
+
+  const loadSuggestions = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+
+      // Construct context object from form inputs
+      const context = Object.entries(processContext).reduce((acc, [key, value]) => {
+        if (value) acc[key as keyof typeof processContext] = value;
+        return acc;
+      }, {} as Partial<typeof processContext>);
+
+      // Create request payload
+      const payload = {
+        deviation_id: deviation.id,
+        context: Object.keys(context).length > 0 ? context : undefined
+      };
+
+      // Add cause or consequence ID if applicable
+      if (selectedCauseId && insightType !== 'causes') {
+        Object.assign(payload, { cause_id: selectedCauseId });
+      }
+      if (selectedConsequenceId && insightType === 'recommendations') {
+        Object.assign(payload, { consequence_id: selectedConsequenceId });
+      }
+
+      // Send request to the appropriate endpoint based on insight type
+      let endpoint;
+      switch (insightType) {
+        case 'causes':
+          endpoint = `${API_URL}/api/gemini/suggest-causes`;
+          break;
+        case 'consequences':
+          endpoint = `${API_URL}/api/gemini/suggest-consequences`;
+          break;
+        case 'recommendations':
+          endpoint = `${API_URL}/api/gemini/suggest-safeguards`;
+          break;
+      }
+
+      const response = await axios.post(
+        endpoint,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update state with suggestions
+      switch (insightType) {
+        case 'causes':
+          setSuggestedCauses(response.data);
+          break;
+        case 'consequences':
+          setSuggestedConsequences(response.data);
+          break;
+        case 'recommendations':
+          setSuggestedRecommendations(response.data);
+          break;
+      }
+
+    } catch (err) {
+      console.error(`Failed to load ${insightType} suggestions:`, err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const applySuggestion = async (suggestion: AISuggestion, type: 'causes' | 'consequences' | 'recommendations') => {
+    try {
+      // Validation: Check if required parent item is selected
+      if (type === 'consequences' && !selectedCauseId) {
+        alert('Please select a Cause first before adding Consequences.\n\nClick on a cause in the list to select it (it will be highlighted).');
+        return;
+      }
+
+      if (type === 'recommendations' && !selectedConsequenceId) {
+        alert('Please select a Consequence first before adding Recommendations.\n\nClick on a consequence in the list to select it (it will be highlighted).');
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      let endpoint;
+      let payload: any = {};
+
+      switch (type) {
+        case 'causes':
+          endpoint = `${API_URL}/api/gemini/apply-suggestions/causes`;
+          payload = {
+            deviation_id: deviation.id,
+            suggestions: [suggestion]
+          };
+          break;
+        case 'consequences':
+          endpoint = `${API_URL}/api/gemini/apply-suggestions/consequences`;
+          payload = {
+            deviation_id: deviation.id,
+            cause_id: selectedCauseId,
+            suggestions: [suggestion]
+          };
+          break;
+        case 'recommendations':
+          endpoint = `${API_URL}/api/gemini/apply-suggestions/safeguards`;
+          payload = {
+            deviation_id: deviation.id,
+            consequence_id: selectedConsequenceId,
+            suggestions: [suggestion]
+          };
+          break;
+      }
+
+      await axios.post(
+        endpoint,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Call appropriate callback
+      if (type === 'causes' && onAddCause) {
+        onAddCause(suggestion);
+      } else if (type === 'consequences' && onAddConsequence) {
+        onAddConsequence(suggestion as AIConsequenceSuggestion);
+      } else if (type === 'recommendations' && onAddSafeguard) {
+        onAddSafeguard(suggestion as AISafeguardSuggestion);
+      }
+
+      // Remove the suggestion from the list
+      if (type === 'causes') {
+        setSuggestedCauses(prev => prev.filter(s => s.text !== suggestion.text));
+      } else if (type === 'consequences') {
+        setSuggestedConsequences(prev => prev.filter(s => s.text !== suggestion.text));
+      } else if (type === 'recommendations') {
+        setSuggestedRecommendations(prev => prev.filter(s => s.text !== suggestion.text));
+      }
+
+    } catch (err) {
+      console.error(`Failed to apply ${type} suggestion:`, err);
+      alert(`Failed to add ${type} suggestion. Please check the console for details.`);
+    }
+  };
+
+  const refreshSuggestions = () => {
+    loadSuggestions();
+  };
+
+  const toggleExpanded = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  return (
+    <div className={`fixed bottom-0 right-0 ${isCollapsed ? 'w-48' : 'w-96'} bg-white rounded-tl-lg shadow-lg transition-all duration-300`}>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2 rounded-tl-lg flex justify-between items-center text-white">
+        <div className="flex items-center gap-2">
+          <span role="img" aria-label="AI">🤖</span>
+          <h3 className="font-bold">Gemini AI Insights</h3>
+        </div>
+        <div className="flex items-center">
+          <button
+            onClick={refreshSuggestions}
+            className="text-white hover:bg-purple-700 rounded p-1 mr-2"
+            title="Refresh suggestions"
+          >
+            🔄
+          </button>
+          <button
+            onClick={toggleExpanded}
+            className="text-white hover:bg-purple-700 rounded p-1"
+          >
+            {isCollapsed ? '➕' : '➖'}
+          </button>
+        </div>
+      </div>
+
+      {/* Content - Only show if not collapsed */}
+      {!isCollapsed && (
+        <div className="p-4">
+          {/* Type Selection Tabs */}
+          <div className="flex border-b mb-3">
+            <button
+              className={`px-3 py-1 ${insightType === 'causes' ? 'border-b-2 border-blue-600 text-blue-600 font-medium' : 'text-gray-500'}`}
+              onClick={() => setInsightType('causes')}
+            >
+              Causes
+            </button>
+            <button
+              className={`px-3 py-1 ${insightType === 'consequences' ? 'border-b-2 border-blue-600 text-blue-600 font-medium' : 'text-gray-500'}`}
+              onClick={() => setInsightType('consequences')}
+            >
+              Consequences
+            </button>
+            <button
+              className={`px-3 py-1 ${insightType === 'recommendations' ? 'border-b-2 border-blue-600 text-blue-600 font-medium' : 'text-gray-500'}`}
+              onClick={() => setInsightType('recommendations')}
+            >
+              Recommendations
+            </button>
+          </div>
+
+          {/* Toggle Context Button */}
+          <button
+            onClick={() => setShowContext(!showContext)}
+            className="mb-3 text-sm text-blue-600 hover:text-blue-800 flex items-center"
+          >
+            {showContext ? '- Hide Context' : '+ Add Context'}
+          </button>
+
+          {/* Context Form - Only show if showContext is true */}
+          {showContext && (
+            <div className="border rounded p-3 mb-3 bg-gray-50">
+              <h4 className="text-sm font-medium mb-2">Process Context</h4>
+              <div className="space-y-2">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Process Description</label>
+                  <input
+                    type="text"
+                    value={processContext.process_description}
+                    onChange={(e) => setProcessContext({...processContext, process_description: e.target.value})}
+                    className="w-full border text-sm rounded px-2 py-1"
+                    placeholder="e.g., Distillation column"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Fluid Type</label>
+                  <input
+                    type="text"
+                    value={processContext.fluid_type}
+                    onChange={(e) => setProcessContext({...processContext, fluid_type: e.target.value})}
+                    className="w-full border text-sm rounded px-2 py-1"
+                    placeholder="e.g., Crude oil"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Operating Conditions</label>
+                  <input
+                    type="text"
+                    value={processContext.operating_conditions}
+                    onChange={(e) => setProcessContext({...processContext, operating_conditions: e.target.value})}
+                    className="w-full border text-sm rounded px-2 py-1"
+                    placeholder="e.g., 250°C, 10 bar"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Previous Incidents</label>
+                  <input
+                    type="text"
+                    value={processContext.previous_incidents}
+                    onChange={(e) => setProcessContext({...processContext, previous_incidents: e.target.value})}
+                    className="w-full border text-sm rounded px-2 py-1"
+                    placeholder="e.g., Valve failure in 2018"
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    className="text-xs bg-blue-600 text-white px-2 py-1 rounded"
+                    onClick={refreshSuggestions}
+                  >
+                    Apply Context
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Selection Required Message */}
+          {!isLoading && insightType === 'consequences' && !selectedCauseId && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-3">
+              <p className="text-sm text-yellow-800 flex items-center">
+                <span className="mr-2">⚠️</span>
+                <span><strong>Note:</strong> Select a Cause from the list above before adding Consequences. Click on a cause to highlight it.</span>
+              </p>
+            </div>
+          )}
+
+          {!isLoading && insightType === 'recommendations' && !selectedConsequenceId && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-3">
+              <p className="text-sm text-yellow-800 flex items-center">
+                <span className="mr-2">⚠️</span>
+                <span><strong>Note:</strong> Select a Consequence from the list above before adding Recommendations. Click on a consequence to highlight it.</span>
+              </p>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {isLoading && (
+            <div className="py-4 text-center">
+              <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+              <p className="text-sm text-gray-600">Generating insights...</p>
+            </div>
+          )}
+
+          {/* Suggestions List */}
+          {!isLoading && (
+            <div className="max-h-64 overflow-y-auto">
+              {insightType === 'causes' && suggestedCauses.length === 0 && (
+                <p className="text-sm text-gray-500 italic text-center py-4">
+                  No cause suggestions available. Click refresh to generate.
+                </p>
+              )}
+
+              {insightType === 'consequences' && suggestedConsequences.length === 0 && (
+                <p className="text-sm text-gray-500 italic text-center py-4">
+                  No consequence suggestions available. Click refresh to generate.
+                </p>
+              )}
+
+              {insightType === 'recommendations' && suggestedRecommendations.length === 0 && (
+                <p className="text-sm text-gray-500 italic text-center py-4">
+                  No safeguard suggestions available. Click refresh to generate.
+                </p>
+              )}
+
+              {/* Cause Suggestions */}
+              {insightType === 'causes' && suggestedCauses.map((suggestion, index) => (
+                <div key={index} className="border mb-2 rounded overflow-hidden">
+                  <div className="bg-blue-50 border-l-4 border-blue-600 p-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{suggestion.text}</p>
+                        <div className="flex items-center mt-1">
+                          <span className="text-xs text-gray-600 bg-blue-100 rounded px-1.5 py-0.5">
+                            Confidence: {suggestion.confidence}%
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        className="ml-2 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded hover:bg-blue-700"
+                        onClick={() => applySuggestion(suggestion, 'causes')}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {suggestion.reasoning && (
+                      <p className="text-xs text-gray-600 mt-1">
+                        {suggestion.reasoning}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Consequence Suggestions */}
+              {insightType === 'consequences' && suggestedConsequences.map((suggestion, index) => (
+                <div key={index} className="border mb-2 rounded overflow-hidden">
+                  <div className="bg-red-50 border-l-4 border-red-600 p-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{suggestion.text}</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <span className="text-xs text-gray-600 bg-red-100 rounded px-1.5 py-0.5">
+                            Confidence: {suggestion.confidence}%
+                          </span>
+                          {suggestion.severity && (
+                            <span className="text-xs text-gray-600 bg-red-100 rounded px-1.5 py-0.5">
+                              Severity: {suggestion.severity}
+                            </span>
+                          )}
+                          {suggestion.category && (
+                            <span className="text-xs text-gray-600 bg-red-100 rounded px-1.5 py-0.5">
+                              {suggestion.category}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        className="ml-2 bg-red-600 text-white text-xs font-medium px-2 py-1 rounded hover:bg-red-700"
+                        onClick={() => applySuggestion(suggestion, 'consequences')}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {suggestion.reasoning && (
+                      <p className="text-xs text-gray-600 mt-1">
+                        {suggestion.reasoning}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Safeguard Suggestions */}
+              {insightType === 'recommendations' && suggestedRecommendations.map((suggestion, index) => (
+                <div key={index} className="border mb-2 rounded overflow-hidden">
+                  <div className="bg-green-50 border-l-4 border-green-600 p-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{suggestion.text}</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <span className="text-xs text-gray-600 bg-green-100 rounded px-1.5 py-0.5">
+                            Confidence: {suggestion.confidence}%
+                          </span>
+                          {suggestion.type && (
+                            <span className="text-xs text-gray-600 bg-green-100 rounded px-1.5 py-0.5">
+                              Type: {suggestion.type}
+                            </span>
+                          )}
+                          {suggestion.effectiveness && (
+                            <span className="text-xs text-gray-600 bg-green-100 rounded px-1.5 py-0.5">
+                              Effectiveness: {suggestion.effectiveness}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        className="ml-2 bg-green-600 text-white text-xs font-medium px-2 py-1 rounded hover:bg-green-700"
+                        onClick={() => applySuggestion(suggestion, 'recommendations')}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {suggestion.reasoning && (
+                      <p className="text-xs text-gray-600 mt-1">
+                        {suggestion.reasoning}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add All Button */}
+          {!isLoading && (
+            (insightType === 'causes' && suggestedCauses.length > 0) ||
+            (insightType === 'consequences' && suggestedConsequences.length > 0) ||
+            (insightType === 'recommendations' && suggestedRecommendations.length > 0)
+          ) && (
+            <div className="mt-3">
+              <button
+                className={`w-full py-2 rounded font-medium ${
+                  (insightType === 'consequences' && !selectedCauseId) ||
+                  (insightType === 'recommendations' && !selectedConsequenceId)
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
+                disabled={
+                  (insightType === 'consequences' && !selectedCauseId) ||
+                  (insightType === 'recommendations' && !selectedConsequenceId)
+                }
+                onClick={() => {
+                  if (insightType === 'causes') {
+                    suggestedCauses.forEach(suggestion => applySuggestion(suggestion, 'causes'));
+                  } else if (insightType === 'consequences') {
+                    suggestedConsequences.forEach(suggestion => applySuggestion(suggestion, 'consequences'));
+                  } else if (insightType === 'recommendations') {
+                    suggestedRecommendations.forEach(suggestion => applySuggestion(suggestion, 'recommendations'));
+                  }
+                }}
+              >
+                Add All Suggestions
+                {((insightType === 'consequences' && !selectedCauseId) ||
+                  (insightType === 'recommendations' && !selectedConsequenceId)) && (
+                  <span className="text-xs ml-1">(Select parent first)</span>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
