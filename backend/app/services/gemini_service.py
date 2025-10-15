@@ -21,9 +21,12 @@ class GeminiService:
     """Service for generating AI-powered HAZOP suggestions using Google Gemini."""
 
     def __init__(self):
-        if not GEMINI_API_KEY:
-            raise ValueError("GEMINI_API_KEY environment variable is not set. Please configure it in backend/.env")
-        self.model = genai.GenerativeModel(MODEL_NAME)
+        self.api_key_configured = bool(GEMINI_API_KEY)
+        if self.api_key_configured:
+            self.model = genai.GenerativeModel(MODEL_NAME)
+        else:
+            self.model = None
+            print("[Gemini] WARNING: GEMINI_API_KEY not configured. AI suggestions will not be available.")
 
     async def suggest_causes(
         self,
@@ -42,6 +45,10 @@ class GeminiService:
         Returns:
             List of cause suggestions with confidence scores
         """
+        if not self.api_key_configured:
+            print("[Gemini] API key not configured, returning empty suggestions")
+            return []
+
         prompt = self._build_causes_prompt(node, deviation, context)
 
         print(f"[Gemini] Generating cause suggestions for deviation: {deviation.parameter}/{deviation.guide_word}")
@@ -78,6 +85,10 @@ class GeminiService:
         Returns:
             List of consequence suggestions with confidence scores
         """
+        if not self.api_key_configured:
+            print("[Gemini] API key not configured, returning empty suggestions")
+            return []
+
         prompt = self._build_consequences_prompt(node, deviation, cause_text, context)
 
         try:
@@ -109,6 +120,10 @@ class GeminiService:
         Returns:
             List of safeguard suggestions with confidence scores
         """
+        if not self.api_key_configured:
+            print("[Gemini] API key not configured, returning empty suggestions")
+            return []
+
         prompt = self._build_safeguards_prompt(
             node, deviation, cause_text, consequence_text, context
         )
@@ -138,6 +153,10 @@ class GeminiService:
         Returns:
             Dictionary with 'causes', 'consequences', and 'safeguards' lists
         """
+        if not self.api_key_configured:
+            print("[Gemini] API key not configured, returning empty analysis")
+            return {"causes": [], "consequences": [], "safeguards": []}
+
         prompt = self._build_complete_analysis_prompt(node, deviation_text, context)
 
         try:
