@@ -1,29 +1,17 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: hazop-db
-    env: docker
-    region: oregon
+databases:
+  - name: hazop-db
+    databaseName: hazop_db
+    user: hazop_user
     plan: free
-    ipAllowList: []
-    databases:
-      - name: hazop_db
-        user: hazop_user
 
+services:
   # Backend API Service
   - type: web
     name: hazop-backend
-    env: python
-    region: oregon
+    runtime: python
     plan: free
-    buildCommand: |
-      cd backend
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      python -c "from app.database import Base, engine; Base.metadata.create_all(bind=engine)"
-    startCommand: |
-      cd backend
-      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -38,28 +26,27 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: CORS_ORIGINS
-        value: "*"
-      - key: PYTHON_VERSION
-        value: "3.11"
+        fromService:
+          type: web
+          name: hazop-frontend
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ENVIRONMENT
+        value: production
     healthCheckPath: /health
 
   # Frontend Static Site
   - type: web
     name: hazop-frontend
-    env: static
-    region: oregon
+    runtime: static
     plan: free
-    buildCommand: |
-      cd frontend
-      npm install
-      VITE_API_URL=$BACKEND_URL npm run build
+    buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
-      - key: BACKEND_URL
+      - key: VITE_API_URL
         fromService:
           type: web
           name: hazop-backend
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
     routes:
       - type: rewrite
         source: /*
