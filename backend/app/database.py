@@ -16,4 +16,8 @@ def get_db():
 
 def init_db():
     """Initialize database tables"""
+    # Import all models so they are registered with Base.metadata
+    from app.models import user, hazop, risk_assessment, organization
+
+    # Create all tables
     Base.metadata.create_all(bind=engine)
