@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DashboardMetricCard } from '../components/dashboard/DashboardMetricCard';
-import { RiskDistributionChart } from '../components/dashboard/RiskDistributionChart';
-import { DeviationsByNodeChart } from '../components/dashboard/DeviationsByNodeChart';
+import { RiskDistributionChart } from '../components/dashboard/SimpleRiskDistributionChart';
+import { DeviationsByNodeChart } from '../components/dashboard/SimpleDeviationsByNodeChart';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 

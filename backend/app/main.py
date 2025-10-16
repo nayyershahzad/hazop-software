@@ -24,18 +24,39 @@ app = FastAPI(
 
 # CORS middleware with environment-aware origins
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000")
-origins = [origin.strip() for origin in CORS_ORIGINS.split(",")]
+origins = []
 
-# Add wildcard for development (will be restricted in production)
-if os.getenv("ENVIRONMENT") == "development":
-    origins.append("*")
+if CORS_ORIGINS == "*":
+    # For development or when explicitly configured to allow all origins
+    origins = ["*"]
+    logging.warning("CORS is configured to allow all origins (*). This is not recommended for production.")
+else:
+    # Parse comma-separated list of allowed origins
+    origins = [origin.strip() for origin in CORS_ORIGINS.split(",") if origin.strip()]
+
+    # Add common development origins if environment is not production
+    if os.getenv("ENVIRONMENT") != "production":
+        dev_origins = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000"]
+        for origin in dev_origins:
+            if origin not in origins:
+                origins.append(origin)
+
+    # Check for Render.com environment and add the frontend URL
+    if os.getenv("RENDER") == "true" and os.getenv("RENDER_EXTERNAL_FRONTEND_URL"):
+        render_frontend = os.getenv("RENDER_EXTERNAL_FRONTEND_URL", "").strip()
+        if render_frontend and render_frontend not in origins:
+            origins.append(render_frontend)
+            logging.info(f"Added Render frontend URL to CORS: {render_frontend}")
+
+logging.info(f"CORS origins configured: {origins}")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
+    max_age=86400  # Cache preflight requests for 1 day
 )
 
 # Add performance middleware for better caching

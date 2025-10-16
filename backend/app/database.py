@@ -16,16 +16,39 @@ MAX_OVERFLOW = int(os.environ.get("MAX_OVERFLOW", "20"))
 POOL_TIMEOUT = int(os.environ.get("POOL_TIMEOUT", "30"))
 POOL_RECYCLE = int(os.environ.get("POOL_RECYCLE", "1800"))
 
-# Add connection pooling parameters for better performance
-engine = create_engine(
-    settings.DATABASE_URL,
-    pool_size=POOL_SIZE,               # Maintain connection pool
-    max_overflow=MAX_OVERFLOW,         # Allow overflow under heavy load
-    pool_timeout=POOL_TIMEOUT,         # Wait time for connection
-    pool_recycle=POOL_RECYCLE,         # Recycle connections
-    pool_pre_ping=True,                # Verify connections before use
-    connect_args={"connect_timeout": 10}  # Connection timeout
-)
+# Configure engine with robust error handling and connection pooling
+try:
+    # For PostgreSQL specific configurations
+    if settings.DATABASE_URL.startswith('postgresql'):
+        engine_args = {
+            "pool_size": POOL_SIZE,
+            "max_overflow": MAX_OVERFLOW,
+            "pool_timeout": POOL_TIMEOUT,
+            "pool_recycle": POOL_RECYCLE,
+            "pool_pre_ping": True,
+            "connect_args": {"connect_timeout": 10}
+        }
+    # For SQLite or other database types
+    else:
+        engine_args = {
+            "pool_pre_ping": True,
+        }
+
+    db_logger.info(f"Initializing database with URL: {settings.DATABASE_URL[:20]}...")
+    engine = create_engine(
+        settings.DATABASE_URL,
+        **engine_args
+    )
+    db_logger.info("Database engine created successfully")
+except Exception as e:
+    db_logger.error(f"Error creating database engine: {e}")
+    # Create a fallback in-memory SQLite database for testing
+    if os.environ.get("ENVIRONMENT") != "production":
+        db_logger.warning("Using in-memory SQLite database as fallback")
+        engine = create_engine("sqlite:///:memory:")
+    else:
+        db_logger.critical("Failed to connect to database in production mode")
+        raise
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
