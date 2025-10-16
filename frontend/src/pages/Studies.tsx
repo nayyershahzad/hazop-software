@@ -28,8 +28,9 @@ export const Studies = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Studies API Response:', response.data);
-      // Just set the data directly as it was before
-      setStudies(response.data);
+      // Handle paginated response - extract items array
+      const studiesData = Array.isArray(response.data) ? response.data : response.data.items || [];
+      setStudies(studiesData);
     } catch (err) {
       console.error('Failed to load studies:', err);
       setStudies([]);

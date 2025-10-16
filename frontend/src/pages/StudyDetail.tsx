@@ -84,7 +84,9 @@ export const StudyDetail = () => {
       const response = await axios.get(`${API_URL}/api/studies/${studyId}/nodes`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setNodes(response.data);
+      // Handle paginated response - extract items array
+      const nodesData = Array.isArray(response.data) ? response.data : response.data.items || [];
+      setNodes(nodesData);
     } catch (err) {
       console.error('Failed to load nodes:', err);
     }
