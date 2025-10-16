@@ -2,7 +2,7 @@ databases:
   - name: hazop-db
     databaseName: hazop_db
     user: hazop_user
-    plan: starter  # Upgrade from free tier for better database performance
+    plan: standard  # Standard tier for better performance
     ipAllowList: []  # Only allow connections from Render services
 
 services:
@@ -11,7 +11,7 @@ services:
     name: hazop-api
     env: python
     region: ohio  # Ohio region has good performance for North American users
-    plan: starter  # Upgrade from free tier for better performance
+    plan: standard  # Standard tier for better performance
     buildCommand: pip install -r backend/requirements.txt
     # Use gunicorn with multiple workers for better performance
     startCommand: cd backend && gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 4 --timeout 60 --keep-alive 120 --access-logfile - --error-logfile - --log-level info --bind 0.0.0.0:$PORT
@@ -56,7 +56,7 @@ services:
   - type: web
     name: hazop-web
     env: static
-    plan: starter  # Upgraded plan for better performance
+    # Note: Static sites on Render's free tier have generous limits
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
     autoDeploy: false  # Manual deployment to ensure everything works
