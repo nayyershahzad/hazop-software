@@ -18,9 +18,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DATABASE_URL
-        fromDatabase:
-          name: hazop-db
-          property: connectionString
+        value: "postgresql://hazop_user:0F72ktpbuK2LKBdfk4nk6InjW9yKCjmo@dpg-d3obtsqli9vc73c116n0-a/hazopdb"
       - key: POOL_SIZE
         value: "10"  # Database connection pool size
       - key: MAX_OVERFLOW
