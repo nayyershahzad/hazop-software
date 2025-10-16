@@ -56,11 +56,11 @@ services:
   - type: web
     name: hazop-web
     env: static
-    buildCommand: cd frontend && npm install && TSC_COMPILE_ON_ERROR=true npm run build
+    buildCommand: cd frontend && npm install --no-audit && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: NODE_VERSION
-        value: 18
+        value: 20.19.0
       - key: VITE_API_URL
         fromService:
           type: web

@@ -10,51 +10,32 @@ export default defineConfig({
   ],
   build: {
     target: 'es2018',
-    minify: 'terser', // Use terser for better minification
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-      },
-    },
+    minify: 'esbuild', // Use esbuild for faster builds
+    sourcemap: false, // Disable sourcemaps in production for smaller files
+    reportCompressedSize: false, // Speed up build by skipping gzipped size calculation
+    chunkSizeWarningLimit: 1000, // Increase the warning limit
     rollupOptions: {
       output: {
+        // Simple chunking strategy
         manualChunks: {
-          // Split large dependencies into separate chunks
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'pdf-viewer': ['react-pdf', 'pdfjs-dist'],
-          'data-viz': ['recharts', 'chart.js'],
-          'utils': ['axios', 'date-fns', 'uuid'],
-          'ui-framework': ['tailwindcss']
-        },
-        // Improve chunking strategy
-        chunkFileNames: (chunkInfo) => {
-          const name = chunkInfo.name;
-          if (name === 'vendor') return 'vendor-[hash].js';
-          return '[name]-[hash].js';
+          vendor: ['react', 'react-dom', 'react-router-dom'],
         },
       },
     },
-    chunkSizeWarningLimit: 1000, // Increase the warning limit
-    sourcemap: false, // Disable sourcemaps in production for smaller files
-    // Enable brotli compression for even smaller files
-    reportCompressedSize: false, // Speed up build by skipping gzipped size calculation
   },
   css: {
     // CSS modules configuration
     modules: {
       localsConvention: 'camelCase',
     },
-    // Optimize CSS
+    // Simplified PostCSS config to avoid dynamic requires
     postcss: {
-      plugins: [
-        require('autoprefixer'),
-        require('cssnano')({
-          preset: ['default', {
-            discardComments: { removeAll: true },
-          }],
-        }),
-      ],
+      plugins: {
+        autoprefixer: {},
+        cssnano: {
+          preset: 'default',
+        },
+      },
     },
   },
   resolve: {
