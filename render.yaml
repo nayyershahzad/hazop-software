@@ -2,8 +2,6 @@ databases:
   - name: hazop-db
     databaseName: hazop_db
     user: hazop_user
-    # Let Render use default plan
-    ipAllowList: []  # Only allow connections from Render services
 
 services:
   # Backend API Service
@@ -56,7 +54,7 @@ services:
   - type: web
     name: hazop-web
     env: static
-    buildCommand: cd frontend && npm install --no-audit && npm run build
+    buildCommand: cd frontend && npm install --no-audit --legacy-peer-deps && VITE_SKIP_POSTCSS=true npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: NODE_VERSION

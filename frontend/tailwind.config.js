@@ -1,3 +1,4 @@
+// Minimal tailwind config to avoid build issues
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [

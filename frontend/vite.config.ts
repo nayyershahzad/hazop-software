@@ -23,21 +23,7 @@ export default defineConfig({
       },
     },
   },
-  css: {
-    // CSS modules configuration
-    modules: {
-      localsConvention: 'camelCase',
-    },
-    // Simplified PostCSS config to avoid dynamic requires
-    postcss: {
-      plugins: {
-        autoprefixer: {},
-        cssnano: {
-          preset: 'default',
-        },
-      },
-    },
-  },
+  // Remove complex CSS processing to fix build issues
   resolve: {
     alias: {
       // Add an alias for source directory
