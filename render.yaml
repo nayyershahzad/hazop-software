@@ -2,7 +2,7 @@ databases:
   - name: hazop-db
     databaseName: hazop_db
     user: hazop_user
-    plan: postgresql-starter  # Current Render.com PostgreSQL starter plan
+    # Let Render use default plan
     ipAllowList: []  # Only allow connections from Render services
 
 services:
