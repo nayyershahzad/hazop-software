@@ -1,4 +1,4 @@
-import { defineConfig, splitVendorChunkPlugin } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
@@ -6,7 +6,7 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [
     react(),
-    splitVendorChunkPlugin(), // Split vendor chunks for better caching
+    // Removed splitVendorChunkPlugin as it's not available in this Vite version
   ],
   build: {
     target: 'es2018',

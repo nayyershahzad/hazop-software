@@ -225,7 +225,7 @@ export const StudyDashboard = () => {
               </div>}>
                 <DeviationsByNodeChart
                   data={dashboardData.metrics.deviations_by_node}
-                  onNodeClick={(nodeId) => navigate(`/studies/${studyId}?node=${nodeId}`)}
+                  onNodeClick={(nodeId: string) => navigate(`/studies/${studyId}?node=${nodeId}`)}
                 />
               </Suspense>
             </div>

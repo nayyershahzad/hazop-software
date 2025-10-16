@@ -38,12 +38,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add compression middleware for better performance
-app.add_middleware(
-    CompressionMiddleware,
-    min_size=500,  # Only compress responses larger than 500 bytes
-    compress_level=6,  # Compression level (1-9, higher = better compression but slower)
-)
+# Add performance middleware for better caching
+app.add_middleware(CompressionMiddleware)
+
+# Add FastAPI's built-in GZip middleware
+from fastapi.middleware.gzip import GZipMiddleware
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # Include routers
 app.include_router(auth.router)

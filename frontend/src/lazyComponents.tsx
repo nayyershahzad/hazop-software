@@ -7,13 +7,13 @@ export const StudyDetail = lazy(() => import('./pages/StudyDetail').then(module 
 export const StudyDashboard = lazy(() => import('./pages/StudyDashboard').then(module => ({ default: module.StudyDashboard })));
 
 // Lazy load large components
-export const HAZOPAnalysis = lazy(() => import('./components/HAZOPAnalysis').then(module => ({ default: module.default })));
-export const PIDViewer = lazy(() => import('./components/PIDViewer').then(module => ({ default: module.default })));
-export const GeminiInsightsPanel = lazy(() => import('./components/GeminiInsightsPanel').then(module => ({ default: module.default })));
-export const ImpactAssessmentForm = lazy(() => import('./components/ImpactAssessmentForm').then(module => ({ default: module.default })));
-export const ContextualKnowledgePanel = lazy(() => import('./components/ContextualKnowledgePanel').then(module => ({ default: module.default })));
-export const RiskMatrixViewer = lazy(() => import('./components/RiskMatrixViewer').then(module => ({ default: module.default })));
+export const HAZOPAnalysis = lazy(() => import('./components/HAZOPAnalysis'));
+export const PIDViewer = lazy(() => import('./components/PIDViewer'));
+export const GeminiInsightsPanel = lazy(() => import('./components/GeminiInsightsPanel'));
+export const ImpactAssessmentForm = lazy(() => import('./components/ImpactAssessmentForm'));
+export const ContextualKnowledgePanel = lazy(() => import('./components/ContextualKnowledgePanel'));
+export const RiskMatrixViewer = lazy(() => import('./components/RiskMatrixViewer'));
 
 // Lazy load dashboard components
-export const DeviationsByNodeChart = lazy(() => import('./components/dashboard/DeviationsByNodeChart').then(module => ({ default: module.default })));
-export const RiskDistributionChart = lazy(() => import('./components/dashboard/RiskDistributionChart').then(module => ({ default: module.default })));
+export const DeviationsByNodeChart = lazy(() => import('./components/dashboard/DeviationsByNodeChart'));
+export const RiskDistributionChart = lazy(() => import('./components/dashboard/RiskDistributionChart'));

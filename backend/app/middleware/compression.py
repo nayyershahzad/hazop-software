@@ -1,7 +1,6 @@
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
-import gzip
 import time
 import logging
 
@@ -9,22 +8,20 @@ logger = logging.getLogger(__name__)
 
 class CompressionMiddleware(BaseHTTPMiddleware):
     """
-    Middleware to compress responses using gzip and add caching headers for better performance.
+    Middleware to add performance headers and caching for better performance.
+    Note: This version doesn't do compression but just adds caching headers.
+    FastAPI's built-in GZipMiddleware can be used if needed.
     """
 
-    def __init__(self, app: ASGIApp, min_size: int = 500, compress_level: int = 6):
+    def __init__(self, app: ASGIApp):
         """
-        Initialize compression middleware.
+        Initialize performance middleware.
 
         Args:
             app: The ASGI application
-            min_size: Minimum size in bytes before compressing (default 500)
-            compress_level: Gzip compression level 1-9 (default 6, higher = better compression but slower)
         """
         super().__init__(app)
-        self.min_size = min_size
-        self.compress_level = compress_level
-        logger.info(f"Compression middleware initialized with min_size={min_size}, level={compress_level}")
+        logger.info(f"Performance middleware initialized")
 
     async def dispatch(self, request: Request, call_next):
         # Track request processing time
@@ -62,66 +59,4 @@ class CompressionMiddleware(BaseHTTPMiddleware):
                     # Default for other GET requests - short cache with revalidation
                     response.headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate"
 
-        # Skip compression for streaming responses or those already compressed
-        if (
-            "Content-Encoding" in response.headers or
-            "Transfer-Encoding" in response.headers or
-            response.status_code < 200 or
-            response.status_code >= 300
-        ):
-            return response
-
-        # Check if client accepts gzip encoding
-        accept_encoding = request.headers.get("accept-encoding", "")
-        if "gzip" not in accept_encoding.lower():
-            return response
-
-        # Skip small responses to avoid compression overhead
-        if (
-            "Content-Length" in response.headers and
-            int(response.headers["Content-Length"]) < self.min_size
-        ):
-            return response
-
-        # Get response body
-        body = b""
-
-        # Response may be StreamingResponse, Response, or other
-        if hasattr(response, "body"):
-            body = response.body
-        elif hasattr(response, "body_iterator"):
-            # For streaming responses, collect the whole body first
-            async for chunk in response.body_iterator:
-                body += chunk
-
-        # Only compress if body is not empty
-        if not body:
-            return response
-
-        # Compress the body
-        compressed_body = gzip.compress(body, compresslevel=self.compress_level)
-
-        # Skip if compression didn't reduce the size (rare but possible)
-        if len(compressed_body) >= len(body):
-            return response
-
-        # Create new response with compressed body
-        resp = Response(
-            content=compressed_body,
-            status_code=response.status_code,
-            headers=dict(response.headers),
-            media_type=response.media_type
-        )
-
-        # Add content encoding header
-        resp.headers["Content-Encoding"] = "gzip"
-        resp.headers["Content-Length"] = str(len(compressed_body))
-        resp.headers["Vary"] = "Accept-Encoding"
-
-        # Add compression ratio for debugging (optional)
-        original_size = len(body)
-        compressed_size = len(compressed_body)
-        compression_ratio = round((1 - compressed_size / original_size) * 100, 2)
-        resp.headers["X-Compression-Ratio"] = f"{compression_ratio}%"
-
-        return resp
+        return response
