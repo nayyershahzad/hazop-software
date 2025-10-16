@@ -125,7 +125,8 @@ export const ImpactAssessmentForm = ({ deviationId, consequenceId, onSaved }: Im
       }
 
       const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 15000  // 15 second timeout
       });
 
       setExistingAssessment(response.data);
@@ -206,19 +207,25 @@ export const ImpactAssessmentForm = ({ deviationId, consequenceId, onSaved }: Im
       const response = await axios.post(
         url,
         formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 30000  // 30 second timeout
+        }
       );
 
       if (response.status >= 200 && response.status < 300) {
-        alert('Impact assessment saved successfully!');
+        alert('✅ Impact assessment saved successfully!');
         await loadExistingAssessment();
         onSaved?.();
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save impact assessment:', err);
-      alert('Failed to save impact assessment. Please try again.');
+      const errorMsg = err.code === 'ECONNABORTED'
+        ? 'Request timed out. Please check your connection and try again.'
+        : err.response?.data?.detail || 'Failed to save impact assessment. Please try again.';
+      alert(`❌ ${errorMsg}`);
     } finally {
       setSaving(false);
     }

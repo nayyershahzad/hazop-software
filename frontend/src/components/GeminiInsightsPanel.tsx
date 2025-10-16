@@ -373,6 +373,47 @@ export const GeminiInsightsPanel = ({
             </div>
           )}
 
+          {/* Add All Button - Sticky at Top */}
+          {!isLoading && (
+            (insightType === 'causes' && suggestedCauses.length > 0) ||
+            (insightType === 'consequences' && suggestedConsequences.length > 0) ||
+            (insightType === 'recommendations' && suggestedRecommendations.length > 0)
+          ) && (
+            <div className="mb-3 sticky top-0 bg-white z-10 pb-2 border-b">
+              <button
+                className={`w-full py-2 rounded font-medium text-sm ${
+                  (insightType === 'consequences' && !selectedCauseId) ||
+                  (insightType === 'recommendations' && !selectedConsequenceId)
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
+                disabled={
+                  (insightType === 'consequences' && !selectedCauseId) ||
+                  (insightType === 'recommendations' && !selectedConsequenceId)
+                }
+                onClick={() => {
+                  if (insightType === 'causes') {
+                    suggestedCauses.forEach(suggestion => applySuggestion(suggestion, 'causes'));
+                  } else if (insightType === 'consequences') {
+                    suggestedConsequences.forEach(suggestion => applySuggestion(suggestion, 'consequences'));
+                  } else if (insightType === 'recommendations') {
+                    suggestedRecommendations.forEach(suggestion => applySuggestion(suggestion, 'recommendations'));
+                  }
+                }}
+              >
+                ➕ Add All {
+                  insightType === 'causes' ? suggestedCauses.length :
+                  insightType === 'consequences' ? suggestedConsequences.length :
+                  suggestedRecommendations.length
+                } Suggestions
+                {((insightType === 'consequences' && !selectedCauseId) ||
+                  (insightType === 'recommendations' && !selectedConsequenceId)) && (
+                  <span className="text-xs ml-1">(Select parent first)</span>
+                )}
+              </button>
+            </div>
+          )}
+
           {/* Suggestions List */}
           {!isLoading && (
             <div className="max-h-64 overflow-y-auto">
@@ -500,43 +541,6 @@ export const GeminiInsightsPanel = ({
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-
-          {/* Add All Button */}
-          {!isLoading && (
-            (insightType === 'causes' && suggestedCauses.length > 0) ||
-            (insightType === 'consequences' && suggestedConsequences.length > 0) ||
-            (insightType === 'recommendations' && suggestedRecommendations.length > 0)
-          ) && (
-            <div className="mt-3">
-              <button
-                className={`w-full py-2 rounded font-medium ${
-                  (insightType === 'consequences' && !selectedCauseId) ||
-                  (insightType === 'recommendations' && !selectedConsequenceId)
-                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
-                }`}
-                disabled={
-                  (insightType === 'consequences' && !selectedCauseId) ||
-                  (insightType === 'recommendations' && !selectedConsequenceId)
-                }
-                onClick={() => {
-                  if (insightType === 'causes') {
-                    suggestedCauses.forEach(suggestion => applySuggestion(suggestion, 'causes'));
-                  } else if (insightType === 'consequences') {
-                    suggestedConsequences.forEach(suggestion => applySuggestion(suggestion, 'consequences'));
-                  } else if (insightType === 'recommendations') {
-                    suggestedRecommendations.forEach(suggestion => applySuggestion(suggestion, 'recommendations'));
-                  }
-                }}
-              >
-                Add All Suggestions
-                {((insightType === 'consequences' && !selectedCauseId) ||
-                  (insightType === 'recommendations' && !selectedConsequenceId)) && (
-                  <span className="text-xs ml-1">(Select parent first)</span>
-                )}
-              </button>
             </div>
           )}
         </div>

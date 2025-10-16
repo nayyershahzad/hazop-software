@@ -549,10 +549,10 @@ Only return the JSON object, no other text."""
             }
 
             generation_config = {
-                "temperature": 0.4,  # Slightly higher for more natural technical responses
-                "top_p": 0.9,
-                "top_k": 40,
-                "max_output_tokens": 4096,  # Increased for complete responses
+                "temperature": 0.3,  # Lower for faster, more consistent responses
+                "top_p": 0.8,
+                "top_k": 20,  # Reduced for faster token selection
+                "max_output_tokens": 2048,  # Reduced for faster response
             }
 
             # Run the blocking Gemini API call in a thread pool executor

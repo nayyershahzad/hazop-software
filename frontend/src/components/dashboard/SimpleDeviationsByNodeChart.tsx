@@ -48,7 +48,7 @@ export const DeviationsByNodeChart = ({ data, onNodeClick }: DeviationsByNodeCha
                 >
                   <div className="text-white font-bold py-2">{item.count}</div>
                 </div>
-                <div className="text-xs font-medium mt-2 rotate-345 max-w-16 truncate" title={item.node_name}>
+                <div className="text-xs font-semibold mt-2 text-gray-900 max-w-20 text-center break-words" title={item.node_name}>
                   {item.node_name}
                 </div>
               </div>

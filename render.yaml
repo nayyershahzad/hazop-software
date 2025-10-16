@@ -34,7 +34,7 @@ services:
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "1440"
       - key: GEMINI_API_KEY
-        sync: false
+        sync: false  # Set this manually in Render dashboard under Environment Variables
       - key: CORS_ORIGINS
         fromService:
           type: web
