@@ -94,11 +94,12 @@ async def suggest_causes(
     # Get the Gemini service singleton
     gemini_service = get_gemini_service()
 
-    # Generate suggestions from Gemini
+    # Generate suggestions from Gemini with cache support
     suggestions = await gemini_service.suggest_causes(
         node=node,
         deviation=deviation,
-        context=req.context.dict() if req.context else None
+        context=req.context.dict() if req.context else None,
+        db=db  # Pass DB session for caching
     )
 
     return suggestions
@@ -124,12 +125,13 @@ async def suggest_consequences(
     # Get the Gemini service singleton
     gemini_service = get_gemini_service()
 
-    # Generate suggestions from Gemini
+    # Generate suggestions from Gemini with cache support
     suggestions = await gemini_service.suggest_consequences(
         node=node,
         deviation=deviation,
         cause_text=cause_text,
-        context=req.context.dict() if req.context else None
+        context=req.context.dict() if req.context else None,
+        db=db  # Pass DB session for caching
     )
 
     return suggestions
@@ -163,13 +165,14 @@ async def suggest_safeguards(
     # Get the Gemini service singleton
     gemini_service = get_gemini_service()
 
-    # Generate suggestions from Gemini
+    # Generate suggestions from Gemini with cache support
     suggestions = await gemini_service.suggest_safeguards(
         node=node,
         deviation=deviation,
         cause_text=cause_text,
         consequence_text=consequence_text,
-        context=req.context.dict() if req.context else None
+        context=req.context.dict() if req.context else None,
+        db=db  # Pass DB session for caching
     )
 
     return suggestions
@@ -187,11 +190,12 @@ async def complete_analysis(
     # Get the Gemini service singleton
     gemini_service = get_gemini_service()
 
-    # Generate complete analysis from Gemini
+    # Generate complete analysis from Gemini with cache support
     analysis = await gemini_service.suggest_complete_analysis(
         node=node,
         deviation_text=deviation.deviation_description,
-        context=req.context.dict() if req.context else None
+        context=req.context.dict() if req.context else None,
+        db=db  # Pass DB session for caching
     )
 
     return analysis
@@ -601,6 +605,47 @@ async def prepare_workshop_intelligence(
         "suggested_questions": [],
         "similar_nodes": [],
         "reference_materials": []
+    }
+
+# Cache statistics endpoint
+@router.get("/cache-stats")
+async def get_cache_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get statistics about the Gemini API cache.
+    Only available to users with admin or owner roles.
+    """
+    # Check if user has required permission
+    if current_user.org_role not in ["owner", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only administrators can access cache statistics"
+        )
+
+    # Create cache service
+    from app.services.gemini_cache import GeminiCacheService
+    cache_service = GeminiCacheService(db)
+
+    # Get statistics
+    stats = cache_service.get_stats()
+
+    # Calculate estimated cost savings
+    # Assuming average cost per Gemini API call: $0.0004
+    estimated_cost_per_call = 0.0004
+    total_hits = stats.get("total_hits", 0)
+    total_entries = stats.get("total_entries", 0)
+    cache_hits = total_hits - total_entries if total_hits > total_entries else 0
+
+    estimated_savings = round(cache_hits * estimated_cost_per_call, 2)
+    hit_rate = round((cache_hits / total_hits * 100) if total_hits > 0 else 0, 2)
+
+    return {
+        **stats,
+        "estimated_cost_savings_usd": estimated_savings,
+        "cache_hit_rate_percent": hit_rate,
+        "cache_status": "active" if stats.get("enabled", False) else "disabled",
     }
 
 # Smart Risk Recalculation Endpoints

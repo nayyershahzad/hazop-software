@@ -1,5 +1,6 @@
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
+gunicorn==22.0.0  # For production-grade WSGI server
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
 pydantic==2.5.0
@@ -12,3 +13,7 @@ python-multipart==0.0.6
 python-dotenv==1.0.0
 google-generativeai==0.8.0
 PyPDF2==3.0.1
+openpyxl==3.1.2  # For Excel export
+gzip-fastapi==0.3.0  # For compression support
+ujson==5.8.0  # Faster JSON parsing
+orjson==3.9.15  # Fast JSON serialization

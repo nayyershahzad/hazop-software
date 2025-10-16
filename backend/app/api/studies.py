@@ -26,6 +26,7 @@ class StudyResponse(BaseModel):
     facility_name: Optional[str]
     status: str
     created_at: datetime
+    node_count: Optional[int] = 0
 
     class Config:
         from_attributes = True
@@ -44,6 +45,7 @@ class NodeResponse(BaseModel):
     description: Optional[str]
     design_intent: Optional[str]
     status: str
+    deviation_count: Optional[int] = 0
 
     class Config:
         from_attributes = True
@@ -83,16 +85,72 @@ def create_study(
     db.refresh(study)
     return study
 
-@router.get("/", response_model=List[StudyResponse])
+from app.api.pagination import PaginationParams, PaginatedResponse
+
+@router.get("/", response_model=PaginatedResponse[StudyResponse])
 def list_studies(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    pagination: PaginationParams = Depends(),
 ):
-    """List all HAZOP studies (organization-isolated)"""
-    studies = db.query(HazopStudy).filter(
+    """
+    List HAZOP studies with pagination and field selection.
+
+    - Supports pagination with skip/limit parameters
+    - Supports field selection with the fields parameter
+    - Results are ordered by most recent first
+    """
+    # Base query with organization isolation
+    base_query = db.query(HazopStudy).filter(
         HazopStudy.organization_id == current_user.organization_id
-    ).all()
-    return studies
+    )
+
+    # Get total count for pagination
+    total_count = base_query.count()
+
+    # Apply pagination
+    studies = base_query.order_by(
+        HazopStudy.created_at.desc()  # Most recent first
+    ).offset(pagination.skip).limit(pagination.limit).all()
+
+    # Only fetch node counts if we have studies
+    study_ids = [study.id for study in studies]
+
+    # Prepare metadata for the response
+    metadata = {"execution_time_ms": 0}
+
+    if study_ids:
+        # Start time tracking for performance metrics
+        import time
+        start_time = time.time()
+
+        # Get node counts per study in a single query
+        from sqlalchemy.sql import func
+        node_counts = dict(
+            db.query(
+                HazopNode.study_id,
+                func.count(HazopNode.id).label("count")
+            ).filter(
+                HazopNode.study_id.in_(study_ids)
+            ).group_by(
+                HazopNode.study_id
+            ).all()
+        )
+
+        # Attach the counts to study objects
+        for study in studies:
+            study.node_count = node_counts.get(study.id, 0)
+
+        # Calculate execution time
+        metadata["execution_time_ms"] = round((time.time() - start_time) * 1000, 2)
+
+    # Create paginated response
+    return PaginatedResponse.create(
+        items=studies,
+        total_count=total_count,
+        params=pagination,
+        metadata=metadata
+    )
 
 @router.get("/{study_id}", response_model=StudyResponse)
 def get_study(
@@ -134,15 +192,70 @@ def create_node(
     db.refresh(node)
     return node
 
-@router.get("/{study_id}/nodes", response_model=List[NodeResponse])
+@router.get("/{study_id}/nodes", response_model=PaginatedResponse[NodeResponse])
 def list_nodes(
     study_id: UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    pagination: PaginationParams = Depends(),
 ):
-    """List all nodes in a study"""
-    nodes = db.query(HazopNode).filter(HazopNode.study_id == study_id).all()
-    return nodes
+    """
+    List all nodes in a study with pagination and optimization
+
+    - Supports pagination with skip/limit parameters
+    - Supports field selection with fields parameter
+    - Optimized query with deviation counts
+    """
+    # Verify study exists and belongs to user's organization
+    study = db.query(HazopStudy).filter(
+        HazopStudy.id == study_id,
+        HazopStudy.organization_id == current_user.organization_id
+    ).first()
+
+    if not study:
+        raise HTTPException(status_code=404, detail="Study not found or access denied")
+
+    # Start time tracking for performance metrics
+    import time
+    start_time = time.time()
+
+    # Query nodes with deviation count optimization
+    from sqlalchemy.sql import func
+
+    # First, get the total count for pagination
+    base_query = db.query(HazopNode).filter(HazopNode.study_id == study_id)
+    total_count = base_query.count()
+
+    # Get the nodes with counts, applying pagination
+    nodes_with_counts = db.query(
+        HazopNode,
+        func.count(Deviation.id).label("deviation_count")
+    ).outerjoin(
+        Deviation, Deviation.node_id == HazopNode.id
+    ).filter(
+        HazopNode.study_id == study_id
+    ).group_by(
+        HazopNode.id
+    ).order_by(
+        HazopNode.node_number
+    ).offset(pagination.skip).limit(pagination.limit).all()
+
+    # Attach deviation counts to node objects
+    result = []
+    for node, deviation_count in nodes_with_counts:
+        node.deviation_count = deviation_count
+        result.append(node)
+
+    # Calculate execution time for metadata
+    execution_time = round((time.time() - start_time) * 1000, 2)
+
+    # Create paginated response
+    return PaginatedResponse.create(
+        items=result,
+        total_count=total_count,
+        params=pagination,
+        metadata={"execution_time_ms": execution_time}
+    )
 
 # Deviation endpoints
 @router.post("/nodes/{node_id}/deviations", response_model=DeviationResponse)
@@ -539,6 +652,8 @@ def copy_from_previous_deviation(
 
 # Dashboard endpoint
 from app.models.risk_assessment import ImpactAssessment
+from sqlalchemy.sql import func
+from sqlalchemy import distinct, case
 
 @router.get("/{study_id}/dashboard")
 def get_study_dashboard(
@@ -547,60 +662,113 @@ def get_study_dashboard(
     current_user: User = Depends(get_current_user)
 ):
     """Get dashboard data for a study"""
+    # Cache in variables to avoid multiple lookups
+    import time
+    start_time = time.time()
+
     study = db.query(HazopStudy).filter(HazopStudy.id == study_id).first()
     if not study:
         raise HTTPException(status_code=404, detail="Study not found")
 
-    # Get all nodes for this study
-    nodes = db.query(HazopNode).filter(HazopNode.study_id == study_id).all()
-    
-    # Count metrics
-    total_nodes = len(nodes)
-    total_deviations = db.query(Deviation).join(HazopNode).filter(
+    # Use a single query with JOIN to get counts by node
+    node_deviation_query = db.query(
+        HazopNode.id.label('node_id'),
+        HazopNode.node_name.label('node_name'),
+        func.count(distinct(Deviation.id)).label('deviation_count')
+    ).join(
+        Deviation, Deviation.node_id == HazopNode.id, isouter=True
+    ).filter(
         HazopNode.study_id == study_id
-    ).count()
-    
-    total_causes = db.query(Cause).join(Deviation).join(HazopNode).filter(
-        HazopNode.study_id == study_id
-    ).count()
-    
-    total_consequences = db.query(Consequence).join(Deviation).join(HazopNode).filter(
-        HazopNode.study_id == study_id
-    ).count()
-    
-    total_safeguards = db.query(Safeguard).join(Consequence).join(Deviation).join(HazopNode).filter(
-        HazopNode.study_id == study_id
-    ).count()
-    
-    total_recommendations = db.query(Recommendation).join(Consequence).join(Deviation).join(HazopNode).filter(
-        HazopNode.study_id == study_id
-    ).count()
-    
-    # Risk distribution
-    risk_assessments = db.query(ImpactAssessment).join(Consequence).join(Deviation).join(HazopNode).filter(
-        HazopNode.study_id == study_id
-    ).all()
-    
-    risk_distribution = {"critical": 0, "high": 0, "medium": 0, "low": 0}
-    for assessment in risk_assessments:
-        if assessment.risk_level:
-            risk_level = assessment.risk_level.lower()
-            if risk_level in risk_distribution:
-                risk_distribution[risk_level] += 1
-    
-    # Deviations by node
-    deviations_by_node = []
-    for node in nodes:
-        dev_count = db.query(Deviation).filter(Deviation.node_id == node.id).count()
-        deviations_by_node.append({
-            "node_id": str(node.id),
-            "node_name": node.node_name,
-            "count": dev_count
-        })
-    
+    ).group_by(
+        HazopNode.id, HazopNode.node_name
+    )
+
+    # Execute query and format results
+    nodes_with_counts = node_deviation_query.all()
+    deviations_by_node = [
+        {
+            "node_id": str(row.node_id),
+            "node_name": row.node_name,
+            "count": row.deviation_count
+        }
+        for row in nodes_with_counts
+    ]
+
     # Sort by count descending
     deviations_by_node.sort(key=lambda x: x["count"], reverse=True)
-    
+
+    # Get total counts efficiently with subqueries
+    # Count nodes directly
+    total_nodes = db.query(func.count(HazopNode.id)).filter(
+        HazopNode.study_id == study_id
+    ).scalar()
+
+    # Create efficient subquery for nodes in this study
+    nodes_subq = db.query(HazopNode.id).filter(
+        HazopNode.study_id == study_id
+    ).subquery()
+
+    # Count entities using subquery - more efficient than multiple joins
+    total_deviations = db.query(func.count(Deviation.id)).filter(
+        Deviation.node_id.in_(nodes_subq)
+    ).scalar()
+
+    # Create deviations subquery
+    deviations_subq = db.query(Deviation.id).filter(
+        Deviation.node_id.in_(nodes_subq)
+    ).subquery()
+
+    # Count entities using subqueries
+    total_causes = db.query(func.count(Cause.id)).filter(
+        Cause.deviation_id.in_(deviations_subq)
+    ).scalar()
+
+    # Create causes subquery
+    causes_subq = db.query(Cause.id).filter(
+        Cause.deviation_id.in_(deviations_subq)
+    ).subquery()
+
+    # Count consequences using subquery
+    total_consequences = db.query(func.count(Consequence.id)).filter(
+        Consequence.deviation_id.in_(deviations_subq)
+    ).scalar()
+
+    # Create consequences subquery
+    consequences_subq = db.query(Consequence.id).filter(
+        Consequence.deviation_id.in_(deviations_subq)
+    ).subquery()
+
+    # Count safeguards using subquery
+    total_safeguards = db.query(func.count(Safeguard.id)).filter(
+        Safeguard.consequence_id.in_(consequences_subq)
+    ).scalar()
+
+    # Count recommendations
+    total_recommendations = db.query(func.count(Recommendation.id)).filter(
+        Recommendation.consequence_id.in_(consequences_subq)
+    ).scalar()
+
+    # Get risk distribution with a single query using CASE statements
+    risk_query = db.query(
+        ImpactAssessment.risk_level.label('level'),
+        func.count(ImpactAssessment.id).label('count')
+    ).filter(
+        ImpactAssessment.consequence_id.in_(consequences_subq)
+    ).group_by(
+        ImpactAssessment.risk_level
+    )
+
+    # Initialize risk distribution
+    risk_distribution = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+
+    # Populate with actual data
+    for row in risk_query:
+        if row.level and row.level.lower() in risk_distribution:
+            risk_distribution[row.level.lower()] = row.count
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+
     return {
         "study": {
             "id": str(study.id),
@@ -616,7 +784,8 @@ def get_study_dashboard(
             "total_recommendations": total_recommendations,
             "risk_distribution": risk_distribution,
             "deviations_by_node": deviations_by_node,
-            "completion_percentage": 0  # Can be calculated based on filled fields
+            "completion_percentage": 0,  # Can be calculated based on filled fields
+            "query_time_ms": round(execution_time * 1000, 2)  # For debugging, can be removed in production
         }
     }
 
