@@ -163,6 +163,26 @@ export const GeminiInsightsPanel = ({
         return;
       }
 
+      // ✨ OPTIMISTIC UI UPDATE - Update UI immediately before API call
+      // Remove from suggestions list right away for instant feedback
+      if (type === 'causes') {
+        setSuggestedCauses(prev => prev.filter(s => s.text !== suggestion.text));
+      } else if (type === 'consequences') {
+        setSuggestedConsequences(prev => prev.filter(s => s.text !== suggestion.text));
+      } else if (type === 'recommendations') {
+        setSuggestedRecommendations(prev => prev.filter(s => s.text !== suggestion.text));
+      }
+
+      // Call callback to update parent component UI immediately
+      if (type === 'causes' && onAddCause) {
+        onAddCause(suggestion);
+      } else if (type === 'consequences' && onAddConsequence) {
+        onAddConsequence(suggestion as AIConsequenceSuggestion);
+      } else if (type === 'recommendations' && onAddRecommendation) {
+        onAddRecommendation(suggestion as AISafeguardSuggestion);
+      }
+
+      // Now save to backend in the background (non-blocking)
       const token = localStorage.getItem('token');
       let endpoint;
       let payload: any = {};
@@ -193,33 +213,24 @@ export const GeminiInsightsPanel = ({
           break;
       }
 
+      // API call happens in background - user already sees the item added
       await axios.post(
         endpoint,
         payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 30000  // 30 second timeout
+        }
       );
 
-      // Call appropriate callback
-      if (type === 'causes' && onAddCause) {
-        onAddCause(suggestion);
-      } else if (type === 'consequences' && onAddConsequence) {
-        onAddConsequence(suggestion as AIConsequenceSuggestion);
-      } else if (type === 'recommendations' && onAddRecommendation) {
-        onAddRecommendation(suggestion as AISafeguardSuggestion);
-      }
-
-      // Remove the suggestion from the list
-      if (type === 'causes') {
-        setSuggestedCauses(prev => prev.filter(s => s.text !== suggestion.text));
-      } else if (type === 'consequences') {
-        setSuggestedConsequences(prev => prev.filter(s => s.text !== suggestion.text));
-      } else if (type === 'recommendations') {
-        setSuggestedRecommendations(prev => prev.filter(s => s.text !== suggestion.text));
-      }
-
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Failed to apply ${type} suggestion:`, err);
-      alert(`Failed to add ${type} suggestion. Please check the console for details.`);
+      const errorMsg = err.code === 'ECONNABORTED'
+        ? 'Request timed out, but the suggestion was added to the UI. Please save your analysis to persist changes.'
+        : err.response?.data?.detail || 'Failed to save suggestion to database. The item is visible in the UI, but please save your analysis manually.';
+
+      // Don't use alert for better UX - just log the error
+      console.warn(`⚠️ Background save warning: ${errorMsg}`);
     }
   };
 
