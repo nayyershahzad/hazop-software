@@ -56,13 +56,11 @@ services:
   - type: web
     name: hazop-web
     env: static
-    # Note: Static sites on Render's free tier have generous limits
-    buildCommand: cd frontend && npm ci && npm run build
+    buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
-    autoDeploy: false  # Manual deployment to ensure everything works
     envVars:
       - key: NODE_VERSION
-        value: 18  # Use newer Node.js version for better performance
+        value: 18
       - key: VITE_API_URL
         fromService:
           type: web
@@ -72,14 +70,3 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-    headers:
-      # Add performance-optimized cache headers for static assets
-      - path: /*.(js|css|jpg|jpeg|png|gif|ico|svg|woff|woff2)
-        name: Cache-Control
-        value: public, max-age=31536000, immutable
-      - path: /
-        name: Cache-Control
-        value: public, max-age=0, must-revalidate
-      - path: /index.html
-        name: Cache-Control
-        value: public, max-age=0, must-revalidate
