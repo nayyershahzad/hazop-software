@@ -56,7 +56,6 @@ services:
   - type: web
     name: hazop-web
     env: static
-    region: ohio  # Same region as backend for reduced latency
     plan: starter  # Upgraded plan for better performance
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
