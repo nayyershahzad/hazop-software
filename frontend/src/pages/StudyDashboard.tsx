@@ -1,11 +1,9 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DashboardMetricCard } from '../components/dashboard/DashboardMetricCard';
-import {
-  RiskDistributionChart,
-  DeviationsByNodeChart
-} from '../lazyComponents';
+import { RiskDistributionChart } from '../components/dashboard/RiskDistributionChart';
+import { DeviationsByNodeChart } from '../components/dashboard/DeviationsByNodeChart';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -206,13 +204,9 @@ export const StudyDashboard = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Risk Distribution</h2>
             <div style={{ height: '300px' }}>
-              <Suspense fallback={<div className="w-full h-full flex items-center justify-center">
-                <p className="text-gray-500">Loading chart...</p>
-              </div>}>
-                <RiskDistributionChart
-                  data={dashboardData.metrics.risk_distribution}
-                />
-              </Suspense>
+              <RiskDistributionChart
+                data={dashboardData.metrics.risk_distribution}
+              />
             </div>
           </div>
 
@@ -220,14 +214,10 @@ export const StudyDashboard = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Deviations by Node</h2>
             <div style={{ height: '300px' }}>
-              <Suspense fallback={<div className="w-full h-full flex items-center justify-center">
-                <p className="text-gray-500">Loading chart...</p>
-              </div>}>
-                <DeviationsByNodeChart
-                  data={dashboardData.metrics.deviations_by_node}
-                  onNodeClick={(nodeId: string) => navigate(`/studies/${studyId}?node=${nodeId}`)}
-                />
-              </Suspense>
+              <DeviationsByNodeChart
+                data={dashboardData.metrics.deviations_by_node}
+                onNodeClick={(nodeId: string) => navigate(`/studies/${studyId}?node=${nodeId}`)}
+              />
             </div>
           </div>
         </div>

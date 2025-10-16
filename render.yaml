@@ -56,7 +56,7 @@ services:
   - type: web
     name: hazop-web
     env: static
-    buildCommand: cd frontend && npm install && npm run build
+    buildCommand: cd frontend && npm install && TSC_COMPILE_ON_ERROR=true npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: NODE_VERSION

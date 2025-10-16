@@ -1,15 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense } from 'react';
 import { useAuthStore } from './store/authStore';
-import LoadingSpinner from './components/LoadingSpinner';
-
-// Import all lazy-loaded components from centralized file
-import {
-  Login,
-  Studies,
-  StudyDetail,
-  StudyDashboard
-} from './lazyComponents';
+// Import components directly
+import { Login } from './pages/Login';
+import { Studies } from './pages/Studies';
+import { StudyDetail } from './pages/StudyDetail';
+import { StudyDashboard } from './pages/StudyDashboard';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -19,36 +14,34 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/studies"
-            element={
-              <ProtectedRoute>
-                <Studies />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/studies/:studyId/dashboard"
-            element={
-              <ProtectedRoute>
-                <StudyDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/studies/:studyId"
-            element={
-              <ProtectedRoute>
-                <StudyDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/" element={<Navigate to="/login" />} />
-        </Routes>
-      </Suspense>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/studies"
+          element={
+            <ProtectedRoute>
+              <Studies />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/studies/:studyId/dashboard"
+          element={
+            <ProtectedRoute>
+              <StudyDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/studies/:studyId"
+          element={
+            <ProtectedRoute>
+              <StudyDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/" element={<Navigate to="/login" />} />
+      </Routes>
     </BrowserRouter>
   );
 }

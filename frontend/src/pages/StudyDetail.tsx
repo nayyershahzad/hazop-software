@@ -1,9 +1,9 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import type { Study, Node, Deviation } from '../types';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { HAZOPAnalysis, PIDViewer } from '../lazyComponents';
+import { HAZOPAnalysis } from '../components/HAZOPAnalysis';
+import { PIDViewer } from '../components/PIDViewer';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -508,13 +508,11 @@ export const StudyDetail = () => {
                         {/* HAZOP Analysis Section - Only show if expanded */}
                         {expandedDeviations.has(dev.id) && selectedDeviation?.id === dev.id && (
                           <div className="p-4 bg-white border-t border-gray-200">
-                            <Suspense fallback={<div className="py-8"><LoadingSpinner /></div>}>
-                              <HAZOPAnalysis
-                                key={dev.id}
-                                deviation={dev}
-                                onUnsavedChanges={setHasUnsavedChanges}
-                              />
-                            </Suspense>
+                            <HAZOPAnalysis
+                              key={dev.id}
+                              deviation={dev}
+                              onUnsavedChanges={setHasUnsavedChanges}
+                            />
                           </div>
                         )}
                       </div>
@@ -789,15 +787,11 @@ export const StudyDetail = () => {
 
       {/* P&ID Viewer - Fixed Bottom Panel */}
       {studyId && (
-        <Suspense fallback={<div className="fixed bottom-0 left-0 w-full h-16 bg-gray-100 flex items-center justify-center">
-          <p className="text-gray-600">Loading P&ID Viewer...</p>
-        </div>}>
-          <PIDViewer
-            studyId={studyId}
-            selectedNodeId={selectedNode?.id}
-            onNodeMarked={loadNodes}
-          />
-        </Suspense>
+        <PIDViewer
+          studyId={studyId}
+          selectedNodeId={selectedNode?.id}
+          onNodeMarked={loadNodes}
+        />
       )}
     </div>
   );
