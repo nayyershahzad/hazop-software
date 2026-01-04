@@ -84,14 +84,14 @@
                         <a href="#signup" class="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-center hover:bg-gray-100 transition">
                             Get Early Access &#x2192;
                         </a>
-                        <a href="#demo" class="border-2 border-white px-8 py-4 rounded-lg font-semibold text-center hover:bg-white/10 transition">
+                        <a href="https://youtu.be/dI2q4Fj3Ork" target="_blank" class="border-2 border-white px-8 py-4 rounded-lg font-semibold text-center hover:bg-white/10 transition">
                             Watch Demo
                         </a>
                     </div>
                     <p class="text-blue-200 text-sm mt-4">&#x2713; Free trial &nbsp; &#x2713; No credit card required</p>
                 </div>
                 <div class="hidden lg:block">
-                    <img src="./screenshots/dashboard.png"
+                    <img src="./screenshots/track.png"
                          alt="HAZOP Software Dashboard"
                          class="rounded-xl shadow-2xl border-4 border-white/20"
                          onerror="this.src='https://placehold.co/600x400/1e40af/white?text=HAZOP+Dashboard'">
@@ -288,32 +288,29 @@
     <section id="signup" class="py-20 gradient-bg text-white">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl lg:text-4xl font-bold mb-4">Ready to Transform Your HAZOP Studies?</h2>
-            <p class="text-xl text-blue-100 mb-8">Join the waitlist for early access and get 3 months free on any paid plan.</p>
+            <p class="text-xl text-blue-100 mb-8">Start using HAZOPCloud today - no credit card required!</p>
 
-            <div class="bg-white rounded-2xl p-8 text-gray-900">
+            <!-- Primary CTA - Go to App -->
+            <a href="https://frontend-mu-two-36.vercel.app" class="inline-block bg-white text-primary px-12 py-5 rounded-lg font-bold text-xl hover:bg-gray-100 transition mb-8 shadow-lg">
+                Get Early Access &#x2192;
+            </a>
+
+            <p class="text-blue-200 mb-8">Or join our mailing list for updates:</p>
+
+            <div class="bg-white/10 backdrop-blur rounded-2xl p-6 text-white">
                 <form action="https://formspree.io/f/meeopnky" method="POST" class="space-y-4">
                     <input type="hidden" name="_subject" value="New HAZOPCloud Signup!">
                     <div class="grid md:grid-cols-2 gap-4">
                         <input type="text" name="name" placeholder="Your Name" required
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                               class="w-full px-4 py-3 rounded-lg border border-white/30 bg-white/10 placeholder-blue-200 focus:ring-2 focus:ring-white focus:border-transparent">
                         <input type="email" name="email" placeholder="Work Email" required
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                               class="w-full px-4 py-3 rounded-lg border border-white/30 bg-white/10 placeholder-blue-200 focus:ring-2 focus:ring-white focus:border-transparent">
                     </div>
-                    <input type="text" name="company" placeholder="Company Name"
-                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
-                    <select name="role" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
-                        <option value="">Select Your Role</option>
-                        <option value="process-engineer">Process Engineer</option>
-                        <option value="safety-engineer">Safety Engineer</option>
-                        <option value="hse-manager">HSE Manager</option>
-                        <option value="consultant">Consultant</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <button type="submit" class="w-full bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-secondary transition">
-                        Get Early Access &#x2192;
+                    <button type="submit" class="w-full bg-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/30 transition border border-white/30">
+                        Subscribe for Updates
                     </button>
                 </form>
-                <p class="text-sm text-gray-500 mt-4">&#x1F512; No spam. Unsubscribe anytime.</p>
+                <p class="text-sm text-blue-200 mt-4">&#x1F512; No spam. Unsubscribe anytime.</p>
             </div>
         </div>
     </section>
