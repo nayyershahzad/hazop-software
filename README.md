@@ -1,35 +1,37 @@
-# HAZOP Analysis System - SaaS Platform
+# HAZOPCloud - AI-Powered HAZOP Analysis Software
 
-Professional HAZOP (Hazard and Operability) study management system with AI-powered suggestions and multi-tenant architecture.
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
+[![React](https://img.shields.io/badge/react-18+-61DAFB.svg)](https://reactjs.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com)
+
+> Streamline HAZOP studies with AI-powered cause-consequence analysis, P&ID integration, and collaborative risk assessment.
+
+**Website**: [hazopcloud.com](https://hazopcloud.com)
+**Documentation**: [docs.hazopcloud.com](https://docs.hazopcloud.com)
+**Blog**: [LinkedIn Article](https://www.linkedin.com/pulse/ai-powered-hazop-software-nayyer-shahzad-kesvf/)
 
 ## Features
 
-- **Multi-Tenant Architecture**: Complete data isolation between organizations
-- **AI-Powered Analysis**: Google Gemini AI integration for intelligent suggestions  
-- **Comprehensive HAZOP Workflow**: Studies, Nodes, Deviations, Causes, Consequences, Safeguards, Recommendations
-- **Risk Assessment**: Built-in risk matrix and impact assessment
-- **P&ID Integration**: Upload and annotate P&ID diagrams
-- **Modern UI**: React + TypeScript frontend with Tailwind CSS
-- **Secure Authentication**: JWT-based auth with password validation
-- **RESTful API**: FastAPI backend with automatic OpenAPI docs
+- **AI-Powered Suggestions** - Gemini AI suggests causes, consequences, and safeguards
+- **Risk Matrix** - Built-in 5x5 risk assessment with customizable scales
+- **P&ID Integration** - Upload and annotate process diagrams
+- **Multi-Tenant** - Organization-based data isolation with role-based access
+- **Export** - Generate professional HAZOP reports in PDF/Excel
 
 ## Tech Stack
 
-**Backend:**
-- FastAPI (Python)
-- PostgreSQL  
-- SQLAlchemy ORM
-- JWT Authentication
-- Google Generative AI (Gemini)
+| Component | Technology |
+|-----------|------------|
+| Backend | FastAPI, Python 3.11, SQLAlchemy |
+| Frontend | React 18, TypeScript, Tailwind CSS |
+| Database | PostgreSQL 14+ |
+| AI | Google Gemini API |
+| Auth | JWT |
 
-**Frontend:**
-- React 18
-- TypeScript
-- Tailwind CSS
-- Zustand (State Management)
-- Axios
+## Quick Start
 
-## Quick Start (Local Development)
+See [QUICK_START.md](QUICK_START.md) for local development setup.
 
 ### Prerequisites
 
@@ -67,28 +69,22 @@ npm run dev
 
 Visit http://localhost:5173
 
-## Deployment to Render.com
+## Deployment
 
-See [RENDER_DEPLOY.md](RENDER_DEPLOY.md) for detailed deployment instructions.
+### Fly.io (Backend)
+See `fly.toml` and `Dockerfile.fly` for backend deployment configuration.
 
-### Quick Deploy
+### Vercel (Frontend)
+See `frontend/vercel.json` for frontend deployment configuration.
 
-```bash
-git init
-git add .
-git commit -m "Initial commit: HAZOP SaaS MVP"
-git branch -M main
-git remote add origin https://github.com/nayyershahzad/hazop-software.git
-git push -u origin main
-```
-
-Then deploy via Render Dashboard using the `render.yaml` blueprint.
+### GitHub Pages (Landing Page)
+See `landing-page/` directory for the marketing landing page.
 
 ## API Documentation
 
 Once deployed, visit:
-- **Swagger UI**: `https://your-backend.onrender.com/docs`
-- **ReDoc**: `https://your-backend.onrender.com/redoc`
+- **Swagger UI**: `https://hazop-backend.fly.dev/docs`
+- **ReDoc**: `https://hazop-backend.fly.dev/redoc`
 
 ## Multi-Tenancy & Data Isolation
 
@@ -114,15 +110,18 @@ All data is isolated by `organization_id`:
 - Organization-level data isolation
 - SQL injection protection via SQLAlchemy ORM
 
+## Contact
+
+Built by **Nayyer Shahzad** - Process Safety Engineer & AI/ML Specialist
+
+- LinkedIn: [@nayyershahzad](https://www.linkedin.com/in/nayyershahzad/)
+- Email: nayyer.shahzad@outlook.com
+
 ## License
 
 Proprietary - All Rights Reserved
 
-## Support
-
-For issues or questions, contact: support@hazopsystem.com
-
 ---
 
-**Version**: 2.0.0-mvp
-**Last Updated**: October 15, 2025
+**Version**: 2.0.0
+**Last Updated**: January 2025

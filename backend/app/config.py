@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     # Database settings
     DATABASE_URL: str
 
+    def __init__(self, **data):
+        super().__init__(**data)
+        # Fly.io uses postgres:// but SQLAlchemy needs postgresql://
+        if self.DATABASE_URL and self.DATABASE_URL.startswith("postgres://"):
+            object.__setattr__(self, 'DATABASE_URL', self.DATABASE_URL.replace("postgres://", "postgresql://", 1))
+
     # Security settings
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"

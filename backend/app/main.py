@@ -26,6 +26,14 @@ app = FastAPI(
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000")
 origins = []
 
+# Production origins for Fly.io/Vercel deployment
+PRODUCTION_ORIGINS = [
+    "https://hazop-frontend.vercel.app",
+    "https://hazopcloud.com",
+    "https://www.hazopcloud.com",
+    "https://app.hazopcloud.com",
+]
+
 if CORS_ORIGINS == "*":
     # For development or when explicitly configured to allow all origins
     origins = ["*"]
@@ -33,6 +41,11 @@ if CORS_ORIGINS == "*":
 else:
     # Parse comma-separated list of allowed origins
     origins = [origin.strip() for origin in CORS_ORIGINS.split(",") if origin.strip()]
+
+    # Add production origins
+    for origin in PRODUCTION_ORIGINS:
+        if origin not in origins:
+            origins.append(origin)
 
     # Add common development origins if environment is not production
     if os.getenv("ENVIRONMENT") != "production":
@@ -47,6 +60,12 @@ else:
         if render_frontend and render_frontend not in origins:
             origins.append(render_frontend)
             logging.info(f"Added Render frontend URL to CORS: {render_frontend}")
+
+    # Check for FRONTEND_URL environment variable (Fly.io)
+    frontend_url = os.getenv("FRONTEND_URL")
+    if frontend_url and frontend_url not in origins:
+        origins.append(frontend_url)
+        logging.info(f"Added FRONTEND_URL to CORS: {frontend_url}")
 
 logging.info(f"CORS origins configured: {origins}")
 
@@ -97,4 +116,4 @@ def root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "service": "hazop-backend", "version": "2.0.0"}

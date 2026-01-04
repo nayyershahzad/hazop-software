@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAZOP Software | AI-Powered Process Safety Analysis</title>
+    <meta name="description" content="Streamline HAZOP studies with AI-powered cause analysis, P&ID integration, and collaborative risk assessment. Built for Oil & Gas and Chemical engineers.">
+    <meta name="keywords" content="HAZOP software, process safety, hazard analysis, SIL assessment, risk matrix, Oil Gas safety, LOPA, PHA">
+    <link rel="canonical" href="https://hazopcloud.com/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="HAZOP Software - AI-Powered Safety Analysis">
+    <meta property="og:description" content="Modern HAZOP study management with Gemini AI suggestions. Reduce study time by 50%.">
+    <meta property="og:image" content="https://hazopcloud.com/og-image.png">
+    <meta property="og:url" content="https://hazopcloud.com/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HAZOP Software - AI-Powered Safety Analysis">
+    <meta name="twitter:description" content="Modern HAZOP study management with AI suggestions">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2697;&#xFE0F;</text></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">&#x2697;&#xFE0F;</span>
+                    <span class="text-xl font-bold text-gray-900">HAZOP<span class="text-primary">Cloud</span></span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-primary">Features</a>
+                    <a href="#how-it-works" class="text-gray-600 hover:text-primary">How It Works</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-primary">Pricing</a>
+                    <a href="#signup" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">Get Early Access</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20 lg:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-block bg-white/20 text-sm px-3 py-1 rounded-full mb-4">
+                        &#x1F680; Now with Gemini AI Integration
+                    </div>
+                    <h1 class="text-4xl lg:text-5xl font-bold leading-tight mb-6">
+                        AI-Powered HAZOP Studies for Modern Engineers
+                    </h1>
+                    <p class="text-xl text-blue-100 mb-8">
+                        Reduce HAZOP study time by 50% with intelligent cause-consequence suggestions,
+                        P&ID integration, and collaborative risk assessment. Built by process safety engineers, for engineers.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#signup" class="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-center hover:bg-gray-100 transition">
+                            Get Early Access &#x2192;
+                        </a>
+                        <a href="#demo" class="border-2 border-white px-8 py-4 rounded-lg font-semibold text-center hover:bg-white/10 transition">
+                            Watch Demo
+                        </a>
+                    </div>
+                    <p class="text-blue-200 text-sm mt-4">&#x2713; Free trial &nbsp; &#x2713; No credit card required</p>
+                </div>
+                <div class="hidden lg:block">
+                    <img src="./screenshots/dashboard.png"
+                         alt="HAZOP Software Dashboard"
+                         class="rounded-xl shadow-2xl border-4 border-white/20"
+                         onerror="this.src='https://placehold.co/600x400/1e40af/white?text=HAZOP+Dashboard'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="py-8 bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-center items-center gap-8 text-gray-400">
+                <span class="text-sm">Built for engineers in:</span>
+                <span class="font-semibold text-gray-600">Oil & Gas</span>
+                <span class="font-semibold text-gray-600">Petrochemical</span>
+                <span class="font-semibold text-gray-600">Chemical Processing</span>
+                <span class="font-semibold text-gray-600">Pharmaceuticals</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem/Solution -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="bg-red-50 p-8 rounded-2xl border border-red-100">
+                    <h3 class="text-xl font-bold text-red-800 mb-4">&#x1F624; Traditional HAZOP Problems</h3>
+                    <ul class="space-y-3 text-red-700">
+                        <li>&#x2022; Studies take weeks with endless Excel spreadsheets</li>
+                        <li>&#x2022; Repetitive documentation of similar deviations</li>
+                        <li>&#x2022; Inconsistent risk rankings across teams</li>
+                        <li>&#x2022; No easy way to reference P&IDs during sessions</li>
+                        <li>&#x2022; Knowledge lost when team members leave</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-8 rounded-2xl border border-green-100">
+                    <h3 class="text-xl font-bold text-green-800 mb-4">&#x2705; With HAZOPCloud</h3>
+                    <ul class="space-y-3 text-green-700">
+                        <li>&#x2022; AI suggests causes, consequences & safeguards</li>
+                        <li>&#x2022; Structured workflow: Node &#x2192; Deviation &#x2192; Analysis</li>
+                        <li>&#x2022; Built-in risk matrix with consistent scoring</li>
+                        <li>&#x2022; Upload & annotate P&IDs directly in the app</li>
+                        <li>&#x2022; All studies searchable and referenceable</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Everything You Need for HAZOP Studies</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">From preparation to reporting, streamline your entire HAZOP workflow.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm transition-all duration-300">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl mb-4">&#x1F916;</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">AI-Powered Suggestions</h3>
+                    <p class="text-gray-600">Gemini AI analyzes your process and suggests potential causes, consequences, and safeguards based on industry best practices.</p>
+                </div>
+
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm transition-all duration-300">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl mb-4">&#x1F4CA;</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Risk Matrix</h3>
+                    <p class="text-gray-600">Built-in 5x5 risk matrix with customizable severity and likelihood scales. Automatic risk ranking and prioritization.</p>
+                </div>
+
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm transition-all duration-300">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl mb-4">&#x1F5BC;&#xFE0F;</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">P&ID Integration</h3>
+                    <p class="text-gray-600">Upload P&ID diagrams, annotate nodes directly on the drawing, and reference during study sessions.</p>
+                </div>
+
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm transition-all duration-300">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center text-2xl mb-4">&#x1F465;</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Multi-Tenant & Collaborative</h3>
+                    <p class="text-gray-600">Invite team members with role-based access. Owner, Admin, Member, and Viewer roles with data isolation.</p>
+                </div>
+
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm transition-all duration-300">
+                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-2xl mb-4">&#x1F4DD;</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Structured Workflow</h3>
+                    <p class="text-gray-600">Studies &#x2192; Nodes &#x2192; Deviations &#x2192; Causes &#x2192; Consequences &#x2192; Safeguards &#x2192; Recommendations. All linked and traceable.</p>
+                </div>
+
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm transition-all duration-300">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-2xl mb-4">&#x1F4C4;</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Export & Reports</h3>
+                    <p class="text-gray-600">Generate professional HAZOP reports in PDF/Excel format. API documentation included for integrations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+                <p class="text-xl text-gray-600">Get started in minutes, not weeks</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
+                    <h3 class="font-bold text-gray-900 mb-2">Create Study</h3>
+                    <p class="text-gray-600 text-sm">Define your process scope, upload P&IDs, and set study parameters</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
+                    <h3 class="font-bold text-gray-900 mb-2">Define Nodes</h3>
+                    <p class="text-gray-600 text-sm">Break down your process into study nodes with design intent</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
+                    <h3 class="font-bold text-gray-900 mb-2">AI Analysis</h3>
+                    <p class="text-gray-600 text-sm">AI suggests deviations, causes & consequences. Review and accept.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
+                    <h3 class="font-bold text-gray-900 mb-2">Generate Report</h3>
+                    <p class="text-gray-600 text-sm">Export professional HAZOP worksheets and action items</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+                <p class="text-xl text-gray-600">Start free, upgrade when you need more</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Starter</h3>
+                    <div class="mb-4">
+                        <span class="text-4xl font-bold">$0</span>
+                        <span class="text-gray-600">/month</span>
+                    </div>
+                    <ul class="space-y-3 text-gray-600 mb-8">
+                        <li>&#x2713; 3 Studies</li>
+                        <li>&#x2713; 2 Team Members</li>
+                        <li>&#x2713; Basic AI Suggestions</li>
+                        <li>&#x2713; P&ID Upload</li>
+                        <li>&#x2713; PDF Export</li>
+                    </ul>
+                    <a href="#signup" class="block text-center border-2 border-primary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition">Start Free</a>
+                </div>
+
+                <div class="bg-primary p-8 rounded-2xl shadow-lg text-white transform scale-105">
+                    <div class="inline-block bg-white/20 text-sm px-3 py-1 rounded-full mb-2">Most Popular</div>
+                    <h3 class="text-xl font-bold mb-2">Professional</h3>
+                    <div class="mb-4">
+                        <span class="text-4xl font-bold">$49</span>
+                        <span class="text-blue-200">/month</span>
+                    </div>
+                    <ul class="space-y-3 text-blue-100 mb-8">
+                        <li>&#x2713; Unlimited Studies</li>
+                        <li>&#x2713; 10 Team Members</li>
+                        <li>&#x2713; Advanced AI Analysis</li>
+                        <li>&#x2713; Risk Matrix Customization</li>
+                        <li>&#x2713; Excel & PDF Export</li>
+                        <li>&#x2713; Priority Support</li>
+                    </ul>
+                    <a href="#signup" class="block text-center bg-white text-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Get Early Access</a>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Enterprise</h3>
+                    <div class="mb-4">
+                        <span class="text-4xl font-bold">Custom</span>
+                    </div>
+                    <ul class="space-y-3 text-gray-600 mb-8">
+                        <li>&#x2713; Unlimited Everything</li>
+                        <li>&#x2713; Unlimited Team Members</li>
+                        <li>&#x2713; Custom AI Training</li>
+                        <li>&#x2713; On-premise Deployment</li>
+                        <li>&#x2713; SSO & LDAP</li>
+                        <li>&#x2713; Dedicated Support</li>
+                    </ul>
+                    <a href="mailto:nayyer.shahzad@outlook.com" class="block text-center border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:border-primary hover:text-primary transition">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA / Signup -->
+    <section id="signup" class="py-20 gradient-bg text-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl lg:text-4xl font-bold mb-4">Ready to Transform Your HAZOP Studies?</h2>
+            <p class="text-xl text-blue-100 mb-8">Join the waitlist for early access and get 3 months free on any paid plan.</p>
+
+            <div class="bg-white rounded-2xl p-8 text-gray-900">
+                <form action="https://formspree.io/f/meeopnky" method="POST" class="space-y-4">
+                    <input type="hidden" name="_subject" value="New HAZOPCloud Signup!">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <input type="text" name="name" placeholder="Your Name" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <input type="email" name="email" placeholder="Work Email" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <input type="text" name="company" placeholder="Company Name"
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <select name="role" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">Select Your Role</option>
+                        <option value="process-engineer">Process Engineer</option>
+                        <option value="safety-engineer">Safety Engineer</option>
+                        <option value="hse-manager">HSE Manager</option>
+                        <option value="consultant">Consultant</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button type="submit" class="w-full bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-secondary transition">
+                        Get Early Access &#x2192;
+                    </button>
+                </form>
+                <p class="text-sm text-gray-500 mt-4">&#x1F512; No spam. Unsubscribe anytime.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About the Creator -->
+    <section class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gray-50 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
+                <div class="w-32 h-32 bg-primary rounded-full flex items-center justify-center text-white text-4xl font-bold flex-shrink-0">
+                    NS
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Built by a Process Safety Engineer</h3>
+                    <p class="text-gray-600 mb-4">
+                        Hi, I'm <strong>Nayyer Shahzad</strong> &#x2014; a Project Management Consultant for Instrumentation & Control
+                        with 7+ years of experience in process safety, HAZOP studies, and AI/ML systems. I built HAZOPCloud
+                        because I've experienced the pain of manual HAZOP documentation firsthand during projects at major
+                        Oil & Gas facilities including Rumaila Oil Field.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="https://www.linkedin.com/in/nayyershahzad/" target="_blank" class="text-primary hover:underline">LinkedIn</a>
+                        <a href="https://medium.com/@931nayyer" target="_blank" class="text-primary hover:underline">Medium</a>
+                        <a href="https://github.com/nayyershahzad" target="_blank" class="text-primary hover:underline">GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="text-2xl">&#x2697;&#xFE0F;</span>
+                        <span class="text-xl font-bold text-white">HAZOPCloud</span>
+                    </div>
+                    <p class="text-sm">AI-powered HAZOP software built by process safety engineers.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#features" class="hover:text-white">Features</a></li>
+                        <li><a href="#pricing" class="hover:text-white">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white">API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white">HAZOP Guide</a></li>
+                        <li><a href="#" class="hover:text-white">Blog</a></li>
+                        <li><a href="https://www.linkedin.com/pulse/ai-powered-hazop-software-nayyer-shahzad-kesvf/" class="hover:text-white" target="_blank">LinkedIn Article</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="https://www.linkedin.com/in/nayyershahzad/" class="hover:text-white" target="_blank">LinkedIn</a></li>
+                        <li><a href="https://github.com/nayyershahzad/hazop-software" class="hover:text-white" target="_blank">GitHub</a></li>
+                        <li><a href="mailto:nayyer.shahzad@outlook.com" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-sm">
+                <p>&#xA9; 2025 HAZOPCloud. Built with &#x2764;&#xFE0F; in Pakistan</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "HAZOPCloud",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "description": "AI-powered HAZOP analysis software for process safety engineers",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Person",
+            "name": "Nayyer Shahzad",
+            "url": "https://www.linkedin.com/in/nayyershahzad/"
+        }
+    }
+    </script>
+</body>
+</html>
